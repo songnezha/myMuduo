@@ -7,21 +7,33 @@ Channel::Channel(int epollfd, int sockfd)
     ,_sockfd(sockfd)
     ,_events(0)
     ,_revents(0)
-    ,_callBack(nullptr)
+    ,_initCallBack(nullptr)
+    ,_readCallBack(nullptr)
 {
 }
 
-void Channel::setCallBack(const CallBack &callBack){
-    _callBack = callBack;
+void Channel::setInitCallBack(const InitCallBack &initCallBack){
+    _initCallBack = initCallBack;
+}
+
+void Channel::setReadCallBack(const ReadCallBack &readCallBack){
+    _readCallBack = readCallBack;
 }
 
 void Channel::setRevents(int revents){
     _revents = revents;
 }
 
+void Channel::setListenfd(int listenfd){
+    _listenfd = listenfd;
+}
+
 void Channel::handleEvent(){
-    if(_revents & (EPOLLIN | EPOLLOUT | EPOLLHUP | EPOLLRDHUP)){
-        _callBack(_sockfd, _revents);
+    if(_listenfd == _sockfd){
+        _initCallBack(_sockfd);
+    }
+    else if(_revents & (EPOLLIN | EPOLLOUT | EPOLLHUP | EPOLLRDHUP)){
+        _readCallBack(_sockfd, _events);
     }
 }
 

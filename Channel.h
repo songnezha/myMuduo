@@ -5,13 +5,16 @@
 
 class  Channel{
 public:
-    typedef std::function<void(int, int)> CallBack;
+    typedef std::function<void(int)> InitCallBack;
+    typedef std::function<void(int, int)> ReadCallBack;
 
     Channel(int epollfd, int sockfd);
     ~Channel() = default;
-    void setCallBack(const CallBack &callBack);
+    void setInitCallBack(const InitCallBack &initCallBack);
+    void setReadCallBack(const ReadCallBack &readCallBack);
     void handleEvent();
     void setRevents(int revent);
+    void setListenfd(int listenfd);
     int  getSockfd();
     void enableReading();
 
@@ -21,7 +24,9 @@ private:
     int _sockfd;
     int _events;
     int _revents;
-    CallBack _callBack;
+    int _listenfd;
+    InitCallBack _initCallBack;
+    ReadCallBack _readCallBack;
 };
 
 #endif
